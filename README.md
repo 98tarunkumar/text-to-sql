@@ -1,4 +1,4 @@
-# 🚀 DBChat - Intelligent Database Query Assistant
+# 🚀 DBChat (text-to-sql) - Intelligent Database Query Assistant
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
