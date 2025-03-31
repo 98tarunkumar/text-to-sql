@@ -1,0 +1,16 @@
+[project]
+name = "dbchat"
+version = "0.1.0"
+description = "PDF Chat with Ollama"
+requires-python = ">=3.10"
+dependencies = [
+    "ollama",
+    "flask",
+    "pypdf",
+    "sentence-transformers",
+    "numpy"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build" 

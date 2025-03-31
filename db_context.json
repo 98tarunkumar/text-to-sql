@@ -1,0 +1,67 @@
+{
+  "schema": {
+    "strict_rules": [
+      "ALWAYS use exact table names: candidates, company, company_candidate_mapping",
+      "NEVER use variations like companies, candidate, mappings",
+      "ALL joins must go through company_candidate_mapping table"
+    ],
+    "tables": {
+      "candidates": {
+        "columns": ["id", "name", "email", "created_at"],
+        "primary_key": "id"
+      },
+      "company": {
+        "columns": ["id", "name", "status", "created_at"],
+        "primary_key": "id"
+      },
+      "company_candidate_mapping": {
+        "columns": ["id", "company_id", "candidate_id", "created_at"],
+        "primary_key": "id",
+        "foreign_keys": {
+          "company_id": {
+            "references": "company",
+            "column": "id"
+          },
+          "candidate_id": {
+            "references": "candidates",
+            "column": "id"
+          }
+        }
+      }
+    },
+    "relationships": [
+      {
+        "tables": ["company", "company_candidate_mapping"],
+        "join": "company.id = company_candidate_mapping.company_id",
+        "description": "Each company can have multiple candidates"
+      },
+      {
+        "tables": ["candidates", "company_candidate_mapping"],
+        "join": "candidates.id = company_candidate_mapping.candidate_id",
+        "description": "Each candidate can be associated with multiple companies"
+      }
+    ]
+  },
+  "common_queries": {
+    "candidate_companies": {
+      "description": "Get all candidates with their associated companies",
+      "query": "SELECT c.name as candidate_name, c.email, comp.name as company_name, comp.status as company_status FROM candidates c JOIN company_candidate_mapping ccm ON c.id = ccm.candidate_id JOIN company comp ON ccm.company_id = comp.id"
+    },
+    "company_candidates": {
+      "description": "Get all candidates for a specific company",
+      "query": "SELECT comp.name as company_name, c.name as candidate_name, c.email FROM company comp JOIN company_candidate_mapping ccm ON comp.id = ccm.company_id JOIN candidates c ON ccm.candidate_id = c.id WHERE comp.name = ?"
+    },
+    "candidate_company_count": {
+      "description": "Get count of companies per candidate",
+      "query": "SELECT c.name as candidate_name, COUNT(DISTINCT comp.id) as company_count FROM candidates c LEFT JOIN company_candidate_mapping ccm ON c.id = ccm.candidate_id LEFT JOIN company comp ON ccm.company_id = comp.id GROUP BY c.id, c.name"
+    },
+    "company_candidate_count": {
+      "description": "Get count of candidates per company",
+      "query": "SELECT comp.name as company_name, COUNT(DISTINCT c.id) as candidate_count FROM company comp LEFT JOIN company_candidate_mapping ccm ON comp.id = ccm.company_id LEFT JOIN candidates c ON ccm.candidate_id = c.id GROUP BY comp.id, comp.name"
+    },
+    "recent_mappings": {
+      "description": "Get recent candidate-company mappings",
+      "query": "SELECT c.name as candidate_name, comp.name as company_name, ccm.created_at FROM candidates c JOIN company_candidate_mapping ccm ON c.id = ccm.candidate_id JOIN company comp ON ccm.company_id = comp.id ORDER BY ccm.created_at DESC LIMIT 10"
+    }
+  }
+}
